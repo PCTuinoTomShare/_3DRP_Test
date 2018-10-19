@@ -6,6 +6,44 @@
 // Initialize.
 void IO_Init( void )
 {
+  //uint32_t temp;
+
+  // DAC write protect off.
+  //temp = DACC->DACC_WPMR;
+  //temp &= 0x00000001;
+  //if( temp )
+  //{
+    //DACC->DACC_WPMR = 0x44414300;
+  //}
+  // DAC channel off..
+  DACC->DACC_CHDR = 0x00000003; // DAC0, DAC1 off.  
+
+  // ADC write protect off. 
+  //temp = ADC->ADC_WPMR;
+  //temp &= 0x00000001;
+  //if( temp )
+  //{
+    //ADC->ADC_WPMR = 0x41444300;
+  //}
+  // ADC channel off.
+  ADC->ADC_CHDR = 0x00003c00; // AD11, AD10, AD12, AD13 off.
+
+  // Port B
+  // PB3, output for extruder #4 motor step control.
+  // PB4, output for extruder #4 motor direct control.
+  // PB5, output for extruder #4 motor enable control.
+  // PB6, output for extruder #5 motor step control.
+  // PB7, output for extruder #5 motor direct control.  
+  // PB8, output for extruder #5 motor enable control.
+  // PB15 ( DAC0 by Arduino DUE ), output for Z axis motor direct control.  
+  // PB16 ( DAC1 by Arduino DUE ), output for Z axis motor step control.
+  // PB17, output for X axis motor direct control.
+  // PB18, output for X axis motor step control.
+  // PB19, output for Y axis motor direct control.
+  // PB20, output for Y axis motor step control.  
+  PIOB->PIO_PER |= 0x001f81f8; // Enable GPIO, disable multiplex.
+  PIOB->PIO_OER |= 0x001f81f8; // Enable output port.
+  
   // Heater output control pins.
   pinMode( IO_HT_BED, OUTPUT ); // Heatbed.
   pinMode( IO_HT_ETD1, OUTPUT ); // Extruder #1.
@@ -34,27 +72,6 @@ void IO_Init( void )
   pinMode( IO_LMT_YMAX, INPUT ); // Y axis limit switch upper.
   pinMode( IO_LMT_ZMIN, INPUT ); // Z axis limit switch lower.
   pinMode( IO_LMT_ZMAX, INPUT ); // Z axis limit switch upper.
-
-  // DAC.
-  DACC->DACC_CHDR = 0x00000003; // DAC0, DAC1 off.  
-  // ADC.
-  ADC->ADC_CHDR = 0x00003c00; // AD11, AD10, AD12, AD13 off.
-
-  // Port B
-  // PB3, output for extruder #4 motor step control.
-  // PB4, output for extruder #4 motor direct control.
-  // PB5, output for extruder #4 motor enable control.
-  // PB6, output for extruder #5 motor step control.
-  // PB7, output for extruder #5 motor direct control.  
-  // PB8, output for extruder #5 motor enable control.
-  // PB15 ( DAC0 by Arduino DUE ), output for Z axis motor direct control.  
-  // PB16 ( DAC1 by Arduino DUE ), output for Z axis motor step control.
-  // PB17, output for X axis motor direct control.
-  // PB18, output for X axis motor step control.
-  // PB19, output for Y axis motor direct control.
-  // PB20, output for Y axis motor step control.  
-  PIOB->PIO_PDR |= 0x001f81f8; // Disable multiplex.
-  PIOB->PIO_OER |= 0x001f81f8; // Enable output.
   
 }
 
@@ -271,7 +288,7 @@ void IO_MOT_E3CW( void )
 // Motor extruder #3 direction CCW.
 void IO_MOT_E3CCW( void )
 {
-  digitalWrite( IO_MOT_E2DIR, HIGH );      
+  digitalWrite( IO_MOT_E3DIR, HIGH );      
 }
 // Motor extruder #4 direction CW.
 void IO_MOT_E4CW( void )
@@ -289,13 +306,13 @@ void IO_MOT_E4CCW( void )
 void IO_MOT_E5CW( void )
 {
   // PB7.
-  PIOB->PIO_CODR = 0x00000100;  
+  PIOB->PIO_CODR = 0x00000080;  
 }
 // Motor extruder #5 direction CCW.
 void IO_MOT_E5CCW( void )
 {
   // PB7.
-  PIOB->PIO_SODR = 0x00000100;    
+  PIOB->PIO_SODR = 0x0000080;    
 }
 
 // Motor X axis step on.

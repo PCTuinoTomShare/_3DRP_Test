@@ -28,10 +28,8 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
   // Serial received task. 
   Serial_Rx_Task();
-
   // Motor task.
   Motor_Task();
   // Heater task.
