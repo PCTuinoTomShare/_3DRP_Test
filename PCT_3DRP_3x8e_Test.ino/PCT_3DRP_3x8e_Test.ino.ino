@@ -5,6 +5,8 @@
 #include "Motor_Task.h"
 #include "Heater_Task.h"
 #include "Fan_Task.h"
+#include "Limit_SW_Task.h"
+#include "Thermo_Task.h"
 
 void setup() {
   // put your setup code here, to run once:
@@ -23,13 +25,18 @@ void setup() {
   Heater_Init();
   // Fan initialize.
   Fan_Init();
-  
+  // Limit switch initialize.
+  Limit_SW_Init();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   // Serial received task. 
   Serial_Rx_Task();
+  // Limit switch task.
+  Limit_SW_Task();
+  // Thermo task.
+  Thermo_Task();
   // Motor task.
   Motor_Task();
   // Heater task.

@@ -33,6 +33,9 @@ void Serial_Rx_Check( void );
 
 // Message dump.
 void Serial_Println( const String &msg );
+void Serial_Print( const String &msg );
+
+void Serial_Print_UINT( uint32_t value );
 
 
 #endif

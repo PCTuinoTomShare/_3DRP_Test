@@ -3,6 +3,7 @@
 #include "Motor_Task.h"
 #include "Heater_Task.h"
 #include "fan_task.h"
+#include "Limit_SW_Task.h"
 
 // Initialize.
 void Serial_Init( void )
@@ -190,7 +191,54 @@ void Serial_Rx_Check( void )
       }     
       break;
 
-    default:    
+    // Limit switch input.
+    case 'L':
+    case 'l':
+      // Received count check.
+      if( uart_rx_cnt < 3 )
+      {
+        // Too few.
+        Serial_Println("input too few < Limit switch >");        
+        break;
+      }                 
+      // Input channel. 
+      temp1 = uart_rx_data[1];
+      temp1 &= 0x0f;
+      if( temp1 > 2 )
+      {
+        temp1 = 2;
+      }
+      temp2 = lmt_flag[temp1];
+      Serial_Print("Limit switch:");
+      Serial_Print_UINT( (uint32_t)temp2  );
+      Serial_Println(" ");            
+      break;
+
+    // Thermos ADC input
+    case 'T':
+    case 't':
+      // Received count check.
+      if( uart_rx_cnt < 3 )
+      {
+        // Too few.
+        Serial_Println("input too few < Thermo ADC >");        
+        break;
+      }                 
+      // Input channel. 
+      temp1 = uart_rx_data[1];
+      temp1 &= 0x0f;
+      if( temp1 > 3 )
+      {
+        temp1 = 3;
+      }      
+      Serial_Print("Thermo ADC:");
+      Serial_Print_UINT( (uint32_t)tmo_value[temp1] );
+      Serial_Println(" ");                
+      break;
+
+    // Undefine command.
+    default:
+        Serial_Println("Error command input");
       break;  
   }
   // Count clear.
@@ -213,5 +261,32 @@ void Serial_Println( const String &msg )
   }  
 }
 
+void Serial_Print( const String &msg )
+{
+  if( serial_type )
+  {
+    // Input feed back, new line.
+    pUSART_USE->print(msg);                   
+  }
+  else
+  {
+    // Input feed back. new line.
+    pUART_USE->print(msg);             
+  }    
+}
+
+void Serial_Print_UINT( uint32_t value )
+{
+  if( serial_type )
+  {
+    // Input feed back, new line.
+    pUSART_USE->print(value);                   
+  }
+  else
+  {
+    // Input feed back. new line.
+    pUART_USE->print(value);             
+  }      
+}
 
 

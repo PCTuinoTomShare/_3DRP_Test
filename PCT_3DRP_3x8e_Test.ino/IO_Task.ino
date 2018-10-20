@@ -8,17 +8,20 @@ void IO_Init( void )
 {
   //uint32_t temp;
 
-  // DAC write protect off.
+  // 3X8E registers setting.
+  // DAC registers write protect off.
   //temp = DACC->DACC_WPMR;
   //temp &= 0x00000001;
   //if( temp )
   //{
     //DACC->DACC_WPMR = 0x44414300;
   //}
-  // DAC channel off..
-  DACC->DACC_CHDR = 0x00000003; // DAC0, DAC1 off.  
+  // DAC channel off.
+  // DAC0 off, for PB15 GPIO function. 
+  // DAC1 off, for PB16 GPIO function. 
+  DACC->DACC_CHDR = 0x00000003;   
 
-  // ADC write protect off. 
+  // ADC registers write protect off. 
   //temp = ADC->ADC_WPMR;
   //temp &= 0x00000001;
   //if( temp )
@@ -26,7 +29,11 @@ void IO_Init( void )
     //ADC->ADC_WPMR = 0x41444300;
   //}
   // ADC channel off.
-  ADC->ADC_CHDR = 0x00003c00; // AD11, AD10, AD12, AD13 off.
+  // AD10 off, for PB17 GPIO. 
+  // AD11 off, for PB18 GPIO.   
+  // AD12 off, for PB19 GPIO. 
+  // AD13 off, for PB20 GPIO.
+  ADC->ADC_CHDR = 0x00003c00; 
 
   // Port B
   // PB3, output for extruder #4 motor step control.
@@ -37,12 +44,12 @@ void IO_Init( void )
   // PB8, output for extruder #5 motor enable control.
   // PB15 ( DAC0 by Arduino DUE ), output for Z axis motor direct control.  
   // PB16 ( DAC1 by Arduino DUE ), output for Z axis motor step control.
-  // PB17, output for X axis motor direct control.
-  // PB18, output for X axis motor step control.
-  // PB19, output for Y axis motor direct control.
-  // PB20, output for Y axis motor step control.  
-  PIOB->PIO_PER |= 0x001f81f8; // Enable GPIO, disable multiplex.
-  PIOB->PIO_OER |= 0x001f81f8; // Enable output port.
+  // PB17 ( A8 by Arduino DUE ), output for X axis motor direct control.
+  // PB18 ( A9 by Arduino DUE ), output for X axis motor step control.
+  // PB19 ( A10 by Arduino DUE ), output for Y axis motor direct control.
+  // PB20 ( A11 by Arduino DUE ), output for Y axis motor step control.  
+  PIOB->PIO_PER = 0x001f81f8; // Enable GPIO, disable multiplexing I/O.
+  PIOB->PIO_OER = 0x001f81f8; // Enable output port.
   
   // Heater output control pins.
   pinMode( IO_HT_BED, OUTPUT ); // Heatbed.
@@ -72,7 +79,8 @@ void IO_Init( void )
   pinMode( IO_LMT_YMAX, INPUT ); // Y axis limit switch upper.
   pinMode( IO_LMT_ZMIN, INPUT ); // Z axis limit switch lower.
   pinMode( IO_LMT_ZMAX, INPUT ); // Z axis limit switch upper.
-  
+  // Emergency switch.
+  pinMode( IO_EMG_SW, INPUT ); // Emergency switch input. 
 }
 
 // Heatbed on.
@@ -140,86 +148,98 @@ void IO_Fan2_Off( void )
 // Motor X axis enable on.
 void IO_MOT_XEN_On( void )
 {
+  // Active low.
   digitalWrite( IO_MOT_XEN, LOW );
 }
 // Motor X axis enable on.
 void IO_MOT_XEN_Off( void )
 {
+  // Inactive high.
   digitalWrite( IO_MOT_XEN, HIGH );  
 }
 // Motor Y axis enable on.
 void IO_MOT_YEN_On( void )
 {
+  // Active low.
   digitalWrite( IO_MOT_YEN, LOW );  
 }
 // Motor Y axis enable on.
 void IO_MOT_YEN_Off( void )
 {
+  // Inactive high.
   digitalWrite( IO_MOT_YEN, HIGH );  
 }
 // Motor Z axis enable on.
 void IO_MOT_ZEN_On( void )
 {
+  // Active low.
   digitalWrite( IO_MOT_ZEN, LOW );  
 }
 // Motor Z axis enable on.
 void IO_MOT_ZEN_Off( void )
 {
+  // Inactive high.
   digitalWrite( IO_MOT_ZEN, HIGH );  
 }
 
 // Motor extruder #1 enable on.
 void IO_MOT_E1EN_On( void )
 {
+  // Active low.
   digitalWrite( IO_MOT_ETD1, LOW );
 }
 // Motor extruder #1 enable off.
 void IO_MOT_E1EN_Off( void )
 {
+  // Inactive high.
   digitalWrite( IO_MOT_ETD1, HIGH );  
 }
 // Motor extruder #2 enable on.
 void IO_MOT_E2EN_On( void )
 {
+  // Active low.
   digitalWrite( IO_MOT_ETD2, LOW );  
 }
 // Motor extruder #2 enable off.
 void IO_MOT_E2EN_Off( void )
 {
+  // Inactive high.
   digitalWrite( IO_MOT_ETD2, HIGH );  
 }
 // Motor extruder #3 enable on.
 void IO_MOT_E3EN_On( void )
 {
+  // Active low.
   digitalWrite( IO_MOT_ETD3, LOW );  
 }
 // Motor extruder #3 enable off.
 void IO_MOT_E3EN_Off( void )
 {
+  // Inactive high.
   digitalWrite( IO_MOT_ETD3, HIGH );  
 }
 // Motor extruder #4 enable on.
 void IO_MOT_E4EN_On( void )
 {
-  // PB5.
+  // PB5, active low.
   PIOB->PIO_CODR = 0x00000020;
 }
 // Motor extruder #4 enable off.
 void IO_MOT_E4EN_Off( void )
 {
-  // PB5.
+  // PB5, inactive high.
   PIOB->PIO_SODR = 0x00000020;  
 }
 // Motor extruder #5 enable on.
 void IO_MOT_E5EN_On( void )
 {
-  // PB8.
+  // PB8, active low.
   PIOB->PIO_CODR = 0x00000100;  
 }
 // Motor extruder #5 enable off.
 void IO_MOT_E5EN_Off( void )
 {
-  // PB8.
+  // PB8, inactive high.
   PIOB->PIO_SODR = 0x00000100;    
 }
 
@@ -411,6 +431,104 @@ void IO_MOT_E5STEP_Off( void )
   PIOB->PIO_CODR = 0x00000040;            
 }
 
+// Limit switch, X axis upper.
+uint8_t IO_LMT_X_UPPER( void )
+{
+  if( digitalRead( IO_LMT_XMAX ) == HIGH )
+  {
+    // Switch not trigger on.
+    return 1;
+  }
+  else
+  {
+    // Switch triggered on.
+    return 0;
+  }
+}
+// Limit switch, X axis lower.
+uint8_t IO_LMT_X_LOWER( void )
+{
+  if( digitalRead( IO_LMT_XMIN ) == HIGH )
+  {
+    // Switch not trigger on.
+    return 1;
+  }
+  else
+  {
+    // Switch triggered on.
+    return 0;
+  }
+}
+// Limit switch, Y axis upper.
+uint8_t IO_LMT_Y_UPPER( void )
+{
+  if( digitalRead( IO_LMT_YMAX ) == HIGH )
+  {
+    // Switch not trigger on.
+    return 1;
+  }
+  else
+  {
+    // Switch triggered on.
+    return 0;
+  }  
+}
+// Limit switch, Y axis lower.
+uint8_t IO_LMT_Y_LOWER( void )
+{
+  if( digitalRead( IO_LMT_YMIN ) == HIGH )
+  {
+    // Switch not trigger on.
+    return 1;
+  }
+  else
+  {
+    // Switch triggered on.
+    return 0;
+  }  
+}
+// Limit switch, Z axis upper.
+uint8_t IO_LMT_Z_UPPER( void )
+{
+  if( digitalRead( IO_LMT_ZMAX ) == HIGH )
+  {
+    // Switch not trigger on.
+    return 1;
+  }
+  else
+  {
+    // Switch triggered on.
+    return 0;
+  }  
+}
+// Limit switch, Z axis lower.
+uint8_t IO_LMT_Z_LOWER( void )
+{
+  if( digitalRead( IO_LMT_ZMIN ) == HIGH )
+  {
+    // Switch not trigger on.
+    return 1;
+  }
+  else
+  {
+    // Switch triggered on.
+    return 0;
+  }  
+}
 
+// Emergency switch.
+uint8_t IO_EMGSW_In( void )
+{
+  if( digitalRead( IO_EMG_SW ) == HIGH )
+  {
+    // Triggered on.
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+  }
+}
 
 

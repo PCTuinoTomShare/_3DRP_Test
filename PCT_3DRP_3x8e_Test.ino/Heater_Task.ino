@@ -16,32 +16,35 @@ void Heater_Init( void )
   pHT_OFF[1] = IO_HT_ETD1_Off;
   pHT_OFF[2] = IO_HT_ETD2_Off;
   pHT_OFF[3] = IO_HT_ETD3_Off;
-  
+
+  // Reset count.
+  ht_dev_cnt = 0;
 }
 
 // Heater task.
 void Heater_Task( void )
 {
   uint8_t temp1;
-  uint8_t temp2;
 
   // Heaters on/off.
-  temp1 = 0;
-  while( temp1 < 4 )
+  temp1 = ht_flag[ht_dev_cnt];
+  temp1 &= 0x01;
+  if( temp1 )
   {
-    temp2 = ht_flag[temp1];
-    temp2 &= 0x01;
-    if( temp2 )
-    {
-      pHT_ON[temp1]();
-    }
-    else
-    {
-      pHT_OFF[temp1]();      
-    }
-
-    ++temp1;    
+    // Turn on.
+    pHT_ON[ht_dev_cnt]();
   }
-  
+  else
+  {
+    // Turn off.
+    pHT_OFF[ht_dev_cnt]();      
+  }
+
+  // For next device to polling.
+  ++ht_dev_cnt;
+  if( ht_dev_cnt == 4 )
+  {
+    ht_dev_cnt = 0;
+  }
 }
 

@@ -37,6 +37,7 @@ void Timer_Task( void )
     {
       // Timeout, clear received hold count.
       uart_rx_cnt = 0;
+      Serial_Println("Input timeout");
     }
   }
 

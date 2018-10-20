@@ -1,5 +1,7 @@
 
 
+#include <stdint.h>
+
 #ifndef _IO_TASK_H_
 #define _IO_TASK_H_
 
@@ -29,6 +31,10 @@
 #define IO_LMT_YMAX 38 // Y axis limit switch upper.
 #define IO_LMT_ZMIN 26 // Z axis limit switch lower.
 #define IO_LMT_ZMAX 34 // Z axis limit switch upper.
+
+#define IO_EMG_SW 40 // Emergency switch in.
+
+
 
 // Initialize.
 void IO_Init( void );
@@ -161,6 +167,20 @@ void IO_MOT_E5STEP_On( void );
 // Motor E5 step off.
 void IO_MOT_E5STEP_Off( void );
 
+// Limit switch, X axis upper.
+uint8_t IO_LMT_X_UPPER( void );
+// Limit switch, X axis lower.
+uint8_t IO_LMT_X_LOWER( void );
+// Limit switch, Y axis upper.
+uint8_t IO_LMT_Y_UPPER( void );
+// Limit switch, Y axis lower.
+uint8_t IO_LMT_Y_LOWER( void );
+// Limit switch, Z axis upper.
+uint8_t IO_LMT_Z_UPPER( void );
+// Limit switch, Z axis lower.
+uint8_t IO_LMT_Z_LOWER( void );
 
+// Emergency switch.
+uint8_t IO_EMGSW_In( void );
 
 #endif
